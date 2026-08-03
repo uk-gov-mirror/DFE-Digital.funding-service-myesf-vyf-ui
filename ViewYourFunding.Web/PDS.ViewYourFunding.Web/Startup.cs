@@ -1,4 +1,6 @@
 using Autofac;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -32,6 +34,7 @@ using PDS.ViewYourFunding.Repositories.Migrations;
 using PDS.ViewYourFunding.Services.Binders;
 using PDS.ViewYourFunding.Services.Config;
 using PDS.ViewYourFunding.Services.DependencyInjection;
+using PDS.ViewYourFunding.Services.Extensions;
 using PDS.ViewYourFunding.Services.Implementations;
 using PDS.ViewYourFunding.Services.Interfaces;
 using PDS.ViewYourFunding.Services.Models;
@@ -172,6 +175,13 @@ namespace PDS.ViewYourFunding.Web
                 opt.Cookie.IsEssential = true;
                 opt.Cookie.SecurePolicy = CookieSecurePolicy.Always;
             });
+
+            var config = new TypeAdapterConfig();
+            config.ConfigureServicesMappings();
+            config.ConfigureWebMappings();
+
+            services.AddSingleton(config);
+            services.AddScoped<IMapper, ServiceMapper>();
         }
 
         /// <summary>

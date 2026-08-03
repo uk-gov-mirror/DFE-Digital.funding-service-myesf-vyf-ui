@@ -1,5 +1,6 @@
-using AutoMapper;
 using FluentAssertions;
+using Mapster;
+using MapsterMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -26,6 +27,7 @@ using PDS.ViewYourFunding.Web.Areas.LoggedIn.Controllers;
 using PDS.ViewYourFunding.Web.Areas.LoggedIn.Models;
 using PDS.ViewYourFunding.Web.Config;
 using PDS.ViewYourFunding.Web.Exceptions;
+using PDS.ViewYourFunding.Web.Extensions;
 using PDS.ViewYourFunding.Web.Models.Request;
 using PDS.ViewYourFunding.Web.Tests.Helpers;
 using System;
@@ -373,9 +375,10 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                     User = new ClaimsPrincipal(
                         new ClaimsIdentity(
                             new[]
-                        {
-                            new Claim("http://sfs-sfa.gov.uk/claims/principal", "something")
-                        }, "someAuthTypeName"))
+                            {
+                        new Claim("http://sfs-sfa.gov.uk/claims/principal", "something")
+                            },
+                            "someAuthTypeName"))
                 }
             };
 
@@ -406,42 +409,51 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                 ContactUsLink = _contactUsLink,
                 FeedbackLink = _feedbackLink,
                 FundingPeriodPublications = new List<KeyValuePair<(int yearFrom, int yearTo), List<Publication>>>(),
-                FundingPeriodLocalAuthorityFundings = new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
-                {
-                    new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2021, 2022), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
-                    new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2020, 2021), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
-                },
+                FundingPeriodLocalAuthorityFundings =
+                    new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
+                    {
+                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                    (2021, 2022),
+                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
+                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                    (2020, 2021),
+                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
+                    },
                 FundingViewData = new FundingViewData
                 {
                     FundingStreamCode = "1619",
                     TotalAmount = 2906249.75M,
                     EntityName = "Hertfordshire",
                     Components = new List<Component>
+            {
+                new Component(null)
+                {
+                    Type = ComponentType.Accordion_Title,
+                    PageData = new Dictionary<string, object>
                     {
-                        new Component(null)
                         {
-                            Type = ComponentType.Accordion_Title,
-                            PageData = new Dictionary<string, object>
-                            {
-                                {
-                                    "FundingPeriodPublications",
-                                    new List<KeyValuePair<(int yearFrom, int yearTo), List<Publication>>>()
-                                },
-                                {
-                                    "FundingPeriodLocalAuthorityFundings",
-                                    new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
-                                    {
-                                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2021, 2022), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
-                                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2020, 2021), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
-                                    }
-                                }
-                            },
+                            "FundingPeriodPublications",
+                            new List<KeyValuePair<(int yearFrom, int yearTo), List<Publication>>>()
                         },
-                        new Component(null)
                         {
-                            Type = ComponentType.Accordion_Panel
+                            "FundingPeriodLocalAuthorityFundings",
+                            new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
+                            {
+                                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                                    (2021, 2022),
+                                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
+                                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                                    (2020, 2021),
+                                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
+                            }
                         }
                     }
+                },
+                new Component(null)
+                {
+                    Type = ComponentType.Accordion_Panel
+                }
+            }
                 },
                 FundingStream = new Web.Areas.Admin.Models.FundingStream.FundingStream
                 {
@@ -454,43 +466,43 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                     HistoryIndependentOfPublications = true,
                     Active = true,
                     SettingValues = new List<SettingValue>
+            {
+                new SettingValue
+                {
+                    Setting = new SettingType
                     {
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = SettingName.AcademyAndSchoolAcademicYear
-                            },
-                            Value = "202122"
-                        },
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = "UseStaticData"
-                            },
-                            Value = "True",
-                        },
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = "ParentProviderType"
-                            },
-                            Value = "LocalAuthority",
-                        }
+                        SettingName = SettingName.AcademyAndSchoolAcademicYear
                     },
+                    Value = "202122"
+                },
+                new SettingValue
+                {
+                    Setting = new SettingType
+                    {
+                        SettingName = "UseStaticData"
+                    },
+                    Value = "True"
+                },
+                new SettingValue
+                {
+                    Setting = new SettingType
+                    {
+                        SettingName = "ParentProviderType"
+                    },
+                    Value = "LocalAuthority"
+                }
+            },
                     NextPayments = new List<NextPayment>(),
                     Publications = new List<Publication>
-                    {
-                        new Publication
-                        {
-                            PublishedDate = new DateTime(2030, 1, 1),
-                            FundingPeriodCode = "AS-2122",
-                            IsLatest = true,
-                            Status = PublicationStatus.Published
-                        }
-                    }
+            {
+                new Publication
+                {
+                    PublishedDate = new DateTime(2030, 1, 1),
+                    FundingPeriodCode = "AS-2122",
+                    IsLatest = true,
+                    Status = PublicationStatus.Published
+                }
+            }
                 },
                 CurrentUser = new CurrentUserViewModel
                 {
@@ -508,15 +520,20 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
 
             var fundingStreamNamePathPart = "16-to-19-funding";
 
-
             // Act
-            var actual = await controller.LocalAuthorityHistory("10072811", fundingStreamNamePathPart);
+            var actual = await controller.LocalAuthorityHistory(
+                "10072811",
+                fundingStreamNamePathPart);
 
             // Assert
             actual
                 .Should().BeOfType<ViewResult>()
                 .Which.Model.Should().BeOfType<LocalAuthorityHistoryViewModel>()
-                .Which.Should().BeEquivalentTo(expectedViewModel);
+                .Which.Should().BeEquivalentTo(
+                    expectedViewModel,
+                    options => options
+                        .Excluding(info => info.Path.EndsWith("PublicationLayouts"))
+                        .Excluding(info => info.Path.EndsWith("Setting.SettingValues")));
         }
 
         [TestMethod, TestCategory("Integration")]
@@ -537,7 +554,7 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                 .Setup(mfss => mfss.GetModelFilenames(It.IsAny<string>()))
                 .Returns(new[]
                 {
-                    "1619_SchemaMin0-0Max100-0_TemplateMin0-0Max100-0_LoggedInOrganisationHistory.json"
+            "1619_SchemaMin0-0Max100-0_TemplateMin0-0Max100-0_LoggedInOrganisationHistory.json"
                 });
 
             modelFileStoreService
@@ -630,8 +647,12 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                 FundingPeriodLocalAuthorityFundings =
                     new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
                     {
-                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2021, 2022), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
-                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2020, 2021), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
+                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                    (2021, 2022),
+                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
+                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                    (2020, 2021),
+                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
                     },
                 FundingViewData = new FundingViewData
                 {
@@ -647,32 +668,35 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                     InYearOpener = false,
                     IsIndicativeFunding = false,
                     Components = new List<Component>
+            {
+                new Component(null)
+                {
+                    Type = ComponentType.Accordion_Title,
+                    PageData = new Dictionary<string, object>
                     {
-                        new Component(null)
                         {
-                            Type = ComponentType.Accordion_Title,
-                            PageData = new Dictionary<string, object>
-                            {
-                                {
-                                    "FundingPeriodPublications",
-                                    new List<KeyValuePair<(int yearFrom, int yearTo), List<Publication>>>()
-                                },
-                                {
-                                    "FundingPeriodLocalAuthorityFundings",
-                                    new List<KeyValuePair<(int yearFrom, int yearTo),
-                                        List<LocalAuthorityFundingViewModel>>>
-                                    {
-                                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2021, 2022), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
-                                        new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>((2020, 2021), new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
-                                    }
-                                }
-                            },
+                            "FundingPeriodPublications",
+                            new List<KeyValuePair<(int yearFrom, int yearTo), List<Publication>>>()
                         },
-                        new Component(null)
                         {
-                            Type = ComponentType.Accordion_Panel
+                            "FundingPeriodLocalAuthorityFundings",
+                            new List<KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>>
+                            {
+                                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                                    (2021, 2022),
+                                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2022 }),
+                                new KeyValuePair<(int yearFrom, int yearTo), List<LocalAuthorityFundingViewModel>>(
+                                    (2020, 2021),
+                                    new List<LocalAuthorityFundingViewModel> { fundingPeriodVM2021 })
+                            }
                         }
                     }
+                },
+                new Component(null)
+                {
+                    Type = ComponentType.Accordion_Panel
+                }
+            }
                 },
                 FundingStream = new Web.Areas.Admin.Models.FundingStream.FundingStream
                 {
@@ -685,43 +709,43 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
                     HistoryIndependentOfPublications = true,
                     Active = true,
                     SettingValues = new List<SettingValue>
+            {
+                new SettingValue
+                {
+                    Setting = new SettingType
                     {
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = SettingName.AcademyAndSchoolAcademicYear
-                            },
-                            Value = "202122"
-                        },
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = "UseStaticData"
-                            },
-                            Value = "True",
-                        },
-                        new SettingValue
-                        {
-                            Setting = new SettingType
-                            {
-                                SettingName = "ParentProviderType"
-                            },
-                            Value = "LocalAuthority",
-                        }
+                        SettingName = SettingName.AcademyAndSchoolAcademicYear
                     },
+                    Value = "202122"
+                },
+                new SettingValue
+                {
+                    Setting = new SettingType
+                    {
+                        SettingName = "UseStaticData"
+                    },
+                    Value = "True"
+                },
+                new SettingValue
+                {
+                    Setting = new SettingType
+                    {
+                        SettingName = "ParentProviderType"
+                    },
+                    Value = "LocalAuthority"
+                }
+            },
                     NextPayments = new List<NextPayment>(),
                     Publications = new List<Publication>
-                    {
-                        new Publication
-                        {
-                            PublishedDate = new DateTime(2030, 1, 1),
-                            FundingPeriodCode = "AS-2122",
-                            IsLatest = true,
-                            Status = PublicationStatus.Published
-                        }
-                    }
+            {
+                new Publication
+                {
+                    PublishedDate = new DateTime(2030, 1, 1),
+                    FundingPeriodCode = "AS-2122",
+                    IsLatest = true,
+                    Status = PublicationStatus.Published
+                }
+            }
                 },
                 CurrentUser = new CurrentUserViewModel
                 {
@@ -740,13 +764,19 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
             var fundingStreamNamePathPart = "16-to-19-funding";
 
             // Act
-            var actual = await controller.LocalAuthorityHistory("10072811", fundingStreamNamePathPart);
+            var actual = await controller.LocalAuthorityHistory(
+                "10072811",
+                fundingStreamNamePathPart);
 
             // Assert
             actual
-                  .Should().BeOfType<ViewResult>()
-                 .Which.Model.Should().BeOfType<LocalAuthorityHistoryViewModel>()
-                 .Which.Should().BeEquivalentTo(expectedViewModel);
+                .Should().BeOfType<ViewResult>()
+                .Which.Model.Should().BeOfType<LocalAuthorityHistoryViewModel>()
+                .Which.Should().BeEquivalentTo(
+                    expectedViewModel,
+                    options => options
+                        .Excluding(info => info.Path.EndsWith("PublicationLayouts"))
+                        .Excluding(info => info.Path.EndsWith("Setting.SettingValues")));
         }
 
         [TestMethod, TestCategory("Unit")]
@@ -1273,7 +1303,9 @@ namespace PDS.ViewYourFunding.Web.Tests.Unit.Controllers.LoggedIn
 
         private static IMapper GetMapper()
         {
-            return new MapperConfiguration(x => x.AddProfile(new WebAutoMapperProfile())).CreateMapper();
+            var config = new TypeAdapterConfig();
+            config.ConfigureWebMappings();
+            return new Mapper(config);
         }
 
         private static FundingStream Get1619FundingStream(

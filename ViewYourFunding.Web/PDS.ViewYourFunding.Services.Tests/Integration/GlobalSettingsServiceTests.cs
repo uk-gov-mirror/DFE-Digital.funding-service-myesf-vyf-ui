@@ -1,10 +1,12 @@
-﻿using AutoMapper;
-using FluentAssertions;
+﻿using FluentAssertions;
+using Mapster;
+using MapsterMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using PDS.ViewYourFunding.Repositories.Implementations;
 using PDS.ViewYourFunding.Repositories.Migrations;
 using PDS.ViewYourFunding.Services.Config;
+using PDS.ViewYourFunding.Services.Extensions;
 using PDS.ViewYourFunding.Services.Implementations;
 using System;
 using System.Runtime.CompilerServices;
@@ -223,9 +225,11 @@ namespace PDS.ViewYourFunding.Services.Tests.Integration
         /// Configure auto-mapper.
         /// </summary>
         /// <returns>Auto-mapper settings.</returns>
-        private static AutoMapper.IMapper GetMapper()
+        private static IMapper GetMapper()
         {
-            return new MapperConfiguration(x => x.AddProfile(new ServicesAutoMapperProfile())).CreateMapper();
+            var config = new TypeAdapterConfig();
+            config.ConfigureServicesMappings();
+            return new Mapper(config);
         }
     }
 }
