@@ -35,8 +35,7 @@ namespace PDS.ViewYourFunding.Services.Extensions
                     src => src.NextPaymentType.Description)
                 .Map(
                     dest => dest.NextPaymentTypeCode,
-                    src => src.NextPaymentType.TypeCode)
-                .TwoWays();
+                    src => src.NextPaymentType.TypeCode);
         }
     }
 }
